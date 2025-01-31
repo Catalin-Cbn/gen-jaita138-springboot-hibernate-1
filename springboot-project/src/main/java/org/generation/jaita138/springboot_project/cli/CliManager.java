@@ -3,18 +3,25 @@ package org.generation.jaita138.springboot_project.cli;
 import java.util.List;
 import java.util.Scanner;
 
+import org.generation.jaita138.springboot_project.db.entity.Ruolo;
 import org.generation.jaita138.springboot_project.db.entity.Utente;
+import org.generation.jaita138.springboot_project.db.service.RuoloService;
 import org.generation.jaita138.springboot_project.db.service.UtenteService;
 
 public class CliManager {
 
     private Scanner sc;
+
     private UtenteService utenteService;
-    
-    public CliManager(UtenteService utenteService) {
+    private RuoloService ruoloService;
+
+    public CliManager(UtenteService utenteService, RuoloService ruoloService) {
+
+        
+        this.utenteService = utenteService;
+        this.ruoloService = ruoloService;
 
         sc = new Scanner(System.in);
-        this.utenteService = utenteService;
 
         printOptions();
     }
@@ -65,7 +72,6 @@ public class CliManager {
             case 9:
                 return;
 
-
             default:
                 System.out.println("Operazione non valida");
                 break;
@@ -103,8 +109,20 @@ public class CliManager {
 
         System.out.println("credito:");
         String strCredito = sc.nextLine();
-        int credito = Integer.parseInt(strCredito)*100;
+        int credito = Integer.parseInt(strCredito) * 100;
         u.setCredito(credito);
+
+        System.out.println("ruoli");
+        List<Ruolo> ruoli = ruoloService.findAll();
+        System.out.println(ruoli);
+        for (Ruolo ruolo : ruoli) {
+            System.out.println(ruolo.getUtenti());
+        }
+        System.out.println("ruolo id");
+        String strRuoloId = sc.nextLine();
+        Long ruoloId = Long.parseLong(strRuoloId);
+        Ruolo ruolo = ruoloService.findById(ruoloId);
+        u.setRuolo(ruolo);
 
         utenteService.save(u);
     }
@@ -115,32 +133,75 @@ public class CliManager {
         Long id = Long.parseLong(strId);
         Utente u = utenteService.findById(id);
 
-        if(u == null) {
+        if (u == null) {
 
             System.out.println("Utente non trovato");
             return;
         }
+        System.out.println("Cosa vuoi modificare? (1-6)");
+        System.out.println("1) Nome: (" + u.getNome() + ")");
+        System.out.println("2) Cognome: (" + u.getCognome() + ")");
+        System.out.println("3) Username: (" + u.getUsername() + ")");
+        System.out.println("4) Password: (" + u.getPassword() + ")");
+        System.out.println("5) Credito: (" + u.getCredito() + ")");
+        System.out.println("6) Ruolo: (" + u.getRuolo() + ")");
 
-        System.out.println("nome: (" + u.getNome() + ")");
-        String nome = sc.nextLine();
-        u.setNome(nome);
+        int scelta = sc.nextInt();
+        sc.nextLine();
         
-        System.out.println("cognome: (" + u.getCognome() + ")");
-        String cognome = sc.nextLine();
-        u.setCognome(cognome);
+        boolean opzioneInvalida = false;
+        String risposta;
+        do {
+            opzioneInvalida = false;    
+            
+            switch (scelta) {
+                case 1:
+                    System.out.println("Modifica il nome: ");
+                    String nome = sc.nextLine();
+                    u.setNome(nome);
+                    break;
+                case 2:
+                    System.out.println("Modifica il cognome: ");
+                    String cognome = sc.nextLine();
+                    u.setCognome(cognome);
+                    break;
+                case 3:
+                    System.out.println("Modifica lo username: ");
+                    String username = sc.nextLine();
+                    u.setPassword(username);
+                    break;
+                case 4:
+                    System.out.println("Modifica la password: ");
+                    String password = sc.nextLine();
+                    u.setPassword(password);
+                    break;
+                case 5:
+                    System.out.println("Modifica il credito: ");
+                    String strCredito = sc.nextLine();
+                    int credito = Integer.parseInt(strCredito) * 100;
+                    u.setCredito(credito);
+                    break;
+                case 6:
+                    System.out.println("Seleziona il nuovo ruolo: ");
+                    List<Ruolo> ruoli = ruoloService.findAll();
+                    System.out.println(ruoli);
+                    System.out.println("ruolo id");
+                    String strRuoloId = sc.nextLine();
+                    Long ruoloId = Long.parseLong(strRuoloId);
+                    Ruolo ruolo = ruoloService.findById(ruoloId);
+                    u.setRuolo(ruolo);
+                    break;
+                default:
+                    System.out.println("Opzione invalida");
+                    opzioneInvalida = true;
+                    break;
+            }
 
-        System.out.println("username: (" + u.getUsername() + ")");
-        String username = sc.nextLine();
-        u.setPassword(username);
+            System.out.println("Vuoi modificare altro? (s/n)");
+            risposta = sc.nextLine();
+            
 
-        System.out.println("password: (" + u.getPassword() + ")");
-        String password = sc.nextLine();
-        u.setPassword(password);
-
-        System.out.println("credito: (" + u.getCredito() + ")");
-        String strCredito = sc.nextLine();
-        int credito = Integer.parseInt(strCredito)*100;
-        u.setCredito(credito);
+        } while (risposta.equalsIgnoreCase("s") || opzioneInvalida);
 
         utenteService.save(u);
     }
@@ -170,7 +231,7 @@ public class CliManager {
     private void cercaPerCredito() {
         System.out.println("Qual'è la soglia di credito?");
         String soglia = sc.nextLine();
-        int sogliaEffettiva = Integer.parseInt(soglia)*100;
+        int sogliaEffettiva = Integer.parseInt(soglia) * 100;
         List<Utente> u = utenteService.sogliaCredito(sogliaEffettiva);
 
         System.out.println(u);
