@@ -115,9 +115,6 @@ public class CliManager {
         System.out.println("ruoli");
         List<Ruolo> ruoli = ruoloService.findAll();
         System.out.println(ruoli);
-        for (Ruolo ruolo : ruoli) {
-            System.out.println(ruolo.getUtenti());
-        }
         System.out.println("ruolo id");
         String strRuoloId = sc.nextLine();
         Long ruoloId = Long.parseLong(strRuoloId);

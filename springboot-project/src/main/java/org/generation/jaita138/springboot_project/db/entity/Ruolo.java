@@ -59,7 +59,7 @@ public class Ruolo {
 
     @Override
     public String toString() {
-        return "Ruolo: [id= " + id + ", nome= " + nome + ", descrizione = " + descrizione /*+ ",utenti = " + utenti */ + "]";
+        return "\nRuolo: [id= " + id + ", nome= " + nome + ", descrizione = " + descrizione + "]";
     }
 
    
