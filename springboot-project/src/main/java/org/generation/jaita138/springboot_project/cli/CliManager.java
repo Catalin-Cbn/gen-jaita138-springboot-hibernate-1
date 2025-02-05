@@ -81,126 +81,33 @@ public class CliManager {
     }
 
     private void readAll() {
-        List<Utente> prodotti = utenteService.findAll();
+        List<Utente> utenti = utenteService.findAll();
         System.out.println("Utenti:");
-        System.out.println(prodotti);
+        System.out.println(utenti);
         System.out.println("-------------------------------------");
     }
 
     private void insert() {
 
-        Utente u = new Utente();
+        Utente utente = new Utente();
 
-        System.out.println("nome:");
-        String nome = sc.nextLine();
-        u.setNome(nome);
+        save(utente);
 
-        System.out.println("cognome:");
-        String cognome = sc.nextLine();
-        u.setCognome(cognome);
-
-        System.out.println("username:");
-        String username = sc.nextLine();
-        u.setUsername(username);
-
-        System.out.println("password:");
-        String password = sc.nextLine();
-        u.setPassword(password);
-
-        System.out.println("credito:");
-        String strCredito = sc.nextLine();
-        int credito = Integer.parseInt(strCredito) * 100;
-        u.setCredito(credito);
-
-        System.out.println("ruoli");
-        List<Ruolo> ruoli = ruoloService.findAll();
-        System.out.println(ruoli);
-        System.out.println("ruolo id");
-        String strRuoloId = sc.nextLine();
-        Long ruoloId = Long.parseLong(strRuoloId);
-        Ruolo ruolo = ruoloService.findById(ruoloId);
-        u.setRuolo(ruolo);
-
-        utenteService.save(u);
     }
 
     private void edit() {
         System.out.println("edit id");
         String strId = sc.nextLine();
         Long id = Long.parseLong(strId);
-        Utente u = utenteService.findById(id);
+        Utente utente = utenteService.findById(id);
 
-        if (u == null) {
+        if (utente == null) {
 
             System.out.println("Utente non trovato");
             return;
         }
-        System.out.println("Cosa vuoi modificare? (1-6)");
-        System.out.println("1) Nome: (" + u.getNome() + ")");
-        System.out.println("2) Cognome: (" + u.getCognome() + ")");
-        System.out.println("3) Username: (" + u.getUsername() + ")");
-        System.out.println("4) Password: (" + u.getPassword() + ")");
-        System.out.println("5) Credito: (" + u.getCredito() + ")");
-        System.out.println("6) Ruolo: (" + u.getRuolo() + ")");
-
-        int scelta = sc.nextInt();
-        sc.nextLine();
         
-        boolean opzioneInvalida = false;
-        String risposta;
-        do {
-            opzioneInvalida = false;    
-            
-            switch (scelta) {
-                case 1:
-                    System.out.println("Modifica il nome: ");
-                    String nome = sc.nextLine();
-                    u.setNome(nome);
-                    break;
-                case 2:
-                    System.out.println("Modifica il cognome: ");
-                    String cognome = sc.nextLine();
-                    u.setCognome(cognome);
-                    break;
-                case 3:
-                    System.out.println("Modifica lo username: ");
-                    String username = sc.nextLine();
-                    u.setPassword(username);
-                    break;
-                case 4:
-                    System.out.println("Modifica la password: ");
-                    String password = sc.nextLine();
-                    u.setPassword(password);
-                    break;
-                case 5:
-                    System.out.println("Modifica il credito: ");
-                    String strCredito = sc.nextLine();
-                    int credito = Integer.parseInt(strCredito) * 100;
-                    u.setCredito(credito);
-                    break;
-                case 6:
-                    System.out.println("Seleziona il nuovo ruolo: ");
-                    List<Ruolo> ruoli = ruoloService.findAll();
-                    System.out.println(ruoli);
-                    System.out.println("ruolo id");
-                    String strRuoloId = sc.nextLine();
-                    Long ruoloId = Long.parseLong(strRuoloId);
-                    Ruolo ruolo = ruoloService.findById(ruoloId);
-                    u.setRuolo(ruolo);
-                    break;
-                default:
-                    System.out.println("Opzione invalida");
-                    opzioneInvalida = true;
-                    break;
-            }
-
-            System.out.println("Vuoi modificare altro? (s/n)");
-            risposta = sc.nextLine();
-            
-
-        } while (risposta.equalsIgnoreCase("s") || opzioneInvalida);
-
-        utenteService.save(u);
+        save(utente);
     }
 
     private void delete() {
@@ -215,6 +122,70 @@ public class CliManager {
             System.out.println("Utente " + strId + " eliminato");
         } else
             System.out.println("Utente non trovato");
+    }
+
+    private void stampaSeparatore() {
+        System.out.println("-----------------------------------------------------");
+    }
+
+    private void save(Utente utente) {
+
+        boolean isInsert = (utente.getId() == null);
+
+        System.out.println("Nome" + (isInsert
+                ? ""
+                : " (" + utente.getNome() + ")"));
+        String nome = sc.nextLine();
+        utente.setNome(nome);
+        
+        System.out.println("Cognome" + (isInsert
+                ? ""
+                : " (" + utente.getCognome() + ")"));
+        String cognome = sc.nextLine();
+        utente.setCognome(cognome);
+
+        System.out.println("Username" + (isInsert
+                ? ""
+                : " (" + utente.getUsername() + ")"));
+        String username = sc.nextLine();
+        utente.setUsername(username);
+
+        System.out.println("Password" + (isInsert
+                ? ""
+                : " (" + utente.getPassword() + ")"));
+        String password = sc.nextLine();
+        utente.setPassword(password);
+
+        System.out.println("Credito" + (isInsert
+                ? ""
+                : " (" + utente.getCredito() + ")"));
+        String strCredito = sc.nextLine();
+        int credito = Integer.parseInt(strCredito) * 100;
+        utente.setCredito(credito);
+
+        //1aN
+        List<Ruolo> ruoli = ruoloService.findAll();
+        if (ruoli.size() > 0) {
+
+            System.out.println("Ruoli"); 
+            ruoli.stream()
+            .map(r -> r.getId() + ". " + r.getNome() + " - " + r.getDescrizione()).
+            forEach(System.out::println);
+            stampaSeparatore();
+
+            String ruoloIDString = (utente.getRuolo() == null) ? "Senza ruolo"
+            : "" + utente.getRuolo().getId();
+            System.out.println("ruolo id" + (isInsert
+            ? ""
+            : " (" + ruoloIDString + ")"));
+            String stringRuoloId = sc.nextLine();
+            Long ruoloId = Long.parseLong(stringRuoloId);
+            Ruolo ruolo = ruoloService.findById(ruoloId);
+
+            utente.setRuolo(ruolo);
+        } else
+            System.out.println("Nessun ruolo disponibile");
+
     }
 
     private void cercaPerIniziale() {
